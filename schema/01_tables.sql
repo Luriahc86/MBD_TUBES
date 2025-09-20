@@ -1,0 +1,55 @@
+DROP TABLE IF EXISTS laporan_penggantian_tissue;
+DROP TABLE IF EXISTS login;
+DROP TABLE IF EXISTS dispenser;
+DROP TABLE IF EXISTS lokasi;
+DROP TABLE IF EXISTS pegawai;
+DROP TABLE IF EXISTS admin;
+
+CREATE TABLE admin (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(50),
+  password VARCHAR(255),
+  nama VARCHAR(100),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE pegawai (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(50),
+  password VARCHAR(255),
+  nama VARCHAR(100),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE lokasi (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nama_lokasi VARCHAR(100)
+);
+
+CREATE TABLE dispenser (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  lokasi_id INT,
+  status VARCHAR(50),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (lokasi_id) REFERENCES lokasi(id)
+);
+
+CREATE TABLE login (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT,
+  role ENUM('admin','pegawai'),
+  waktu_login DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE laporan_penggantian_tissue (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  pegawai_id INT,
+  dispenser_id INT,
+  jumlah INT,
+  tanggal DATE,
+  FOREIGN KEY (pegawai_id) REFERENCES pegawai(id),
+  FOREIGN KEY (dispenser_id) REFERENCES dispenser(id)
+);
