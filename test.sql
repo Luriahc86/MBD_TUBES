@@ -24,10 +24,9 @@ INSERT INTO dispenser (lokasi_id, status)
 VALUES (1, 'Aktif'), 
        (2, 'Aktif');
 
--- Tambah laporan penggantian via procedure
+-- Tambah laporan penggantian via procedure (procedure sudah ada di main.sql)
 CALL tambah_laporan_penggantian(1, 1, 5, CURDATE());
 CALL tambah_laporan_penggantian(2, 2, 3, CURDATE());
-
 
 -- ====================================
 -- TEST FUNCTION
@@ -37,7 +36,6 @@ SELECT '=== HASIL FUNCTION: total_tisu_by_pegawai ===' AS header;
 SELECT 
     1 AS pegawai_id,
     total_tisu_by_pegawai(1) AS total_tisu;
-
 
 -- ====================================
 -- TEST VIEW
@@ -54,7 +52,6 @@ SELECT
 FROM v_laporan_penggantian
 ORDER BY tanggal DESC
 LIMIT 10;
-
 
 -- ====================================
 -- TEST TRIGGER
@@ -74,7 +71,6 @@ SELECT
     DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i:%s') AS updated_at
 FROM pegawai
 WHERE id = 1;
-
 
 -- ====================================
 -- SELESAI TESTING

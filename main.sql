@@ -2,105 +2,141 @@
 -- MAIN FILE UNTUK IMPORT LANGSUNG KE MYSQL
 -- ===========================================
 
--- Bersihkan dan buat ulang database
 DROP DATABASE IF EXISTS cleaning_db;
 CREATE DATABASE cleaning_db;
 USE cleaning_db;
 
 -- ===========================================
--- SCHEMA / TABEL
--- ===========================================
-/* Copy semua CREATE TABLE dari schema/01_tables.sql di sini */
-
--- ===========================================
--- PROCEDURES
--- ===========================================
-/* Copy isi procedures/tambah_laporan_penggantian.sql di sini */
-
--- ===========================================
--- FUNCTIONS
--- ===========================================
-/* Copy isi functions/total_tisu_by_pegawai.sql di sini */
-
--- ===========================================
--- TRIGGERS
--- ===========================================
-/* Copy isi triggers/update_pegawai_timestamp.sql di sini */
-/* Copy isi triggers/update_dispenser_timestamp.sql di sini */
-
--- ===========================================
--- VIEWS
--- ===========================================
-/* Copy isi views/v_laporan_penggantian.sql di sini */
-
--- ===========================================
--- SEED DATA (Data Awal)
--- ===========================================
-/* Copy isi seed/00_reset.sql, 01_admin.sql, 02_pegawai.sql, dst di sini */
-
--- ===========================================
--- TESTING (seperti yang kamu tulis)
+-- TABEL
 -- ===========================================
 
-USE cleaning_db;
+-- Tabel admin
+CREATE TABLE admin (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(50) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  nama VARCHAR(100) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 
--- Tambah admin
-INSERT INTO admin (username, password, nama)
-VALUES ('admin1', '12345', 'Super Admin');
+-- Tabel pegawai
+CREATE TABLE pegawai (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(50) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  nama VARCHAR(100) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 
--- Tambah pegawai
-INSERT INTO pegawai (username, password, nama)
-VALUES 
-  ('pegawai1', 'abc123', 'Faqih Chairul Anam'),
-  ('pegawai2', 'xyz456', 'Alya Juniar');
+-- Tabel lokasi
+CREATE TABLE lokasi (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nama_lokasi VARCHAR(100) NOT NULL
+);
 
--- Tambah lokasi
-INSERT INTO lokasi (nama_lokasi) 
-VALUES ('Lobi Utama'), 
-       ('Ruang Tunggu A');
+-- Tabel dispenser
+CREATE TABLE dispenser (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  lokasi_id INT NOT NULL,
+  status VARCHAR(20) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (lokasi_id) REFERENCES lokasi(id)
+);
 
--- Tambah dispenser
-INSERT INTO dispenser (lokasi_id, status) 
-VALUES (1, 'Aktif'), 
-       (2, 'Aktif');
+-- Tabel laporan_penggantian
+CREATE TABLE laporan_penggantian (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  pegawai_id INT NOT NULL,
+  dispenser_id INT NOT NULL,
+  jumlah INT NOT NULL,
+  tanggal DATE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (pegawai_id) REFERENCES pegawai(id),
+  FOREIGN KEY (dispenser_id) REFERENCES dispenser(id)
+);
 
--- Tambah laporan penggantian via procedure
-CALL tambah_laporan_penggantian(1, 1, 5, CURDATE());
-CALL tambah_laporan_penggantian(2, 2, 3, CURDATE());
+-- ===========================================
+-- PROCEDURE
+-- ===========================================
 
--- TEST FUNCTION
-SELECT '=== HASIL FUNCTION: total_tisu_by_pegawai ===' AS header;
+DELIMITER $$
+
+CREATE PROCEDURE tambah_laporan_penggantian (
+    IN p_pegawai_id INT,
+    IN p_dispenser_id INT,
+    IN p_jumlah INT,
+    IN p_tanggal DATE
+)
+BEGIN
+    INSERT INTO laporan_penggantian (pegawai_id, dispenser_id, jumlah, tanggal)
+    VALUES (p_pegawai_id, p_dispenser_id, p_jumlah, p_tanggal);
+END$$
+
+DELIMITER ;
+
+-- ===========================================
+-- FUNCTION
+-- ===========================================
+
+DELIMITER $$
+
+CREATE FUNCTION total_tisu_by_pegawai(p_pegawai_id INT)
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE total INT;
+    SELECT COALESCE(SUM(jumlah),0) INTO total
+    FROM laporan_penggantian
+    WHERE pegawai_id = p_pegawai_id;
+    RETURN total;
+END$$
+
+DELIMITER ;
+
+-- ===========================================
+-- VIEW
+-- ===========================================
+
+CREATE OR REPLACE VIEW v_laporan_penggantian AS
 SELECT 
-    1 AS pegawai_id,
-    total_tisu_by_pegawai(1) AS total_tisu;
+    lp.id,
+    p.nama AS nama_pegawai,
+    lp.dispenser_id,
+    l.nama_lokasi,
+    lp.jumlah,
+    lp.tanggal
+FROM laporan_penggantian lp
+JOIN pegawai p ON lp.pegawai_id = p.id
+JOIN dispenser d ON lp.dispenser_id = d.id
+JOIN lokasi l ON d.lokasi_id = l.id;
 
--- TEST VIEW
-SELECT '=== HASIL VIEW: v_laporan_penggantian ===' AS header;
-SELECT 
-    id AS laporan_id,
-    nama_pegawai,
-    dispenser_id,
-    nama_lokasi,
-    jumlah,
-    DATE_FORMAT(tanggal, '%Y-%m-%d') AS tanggal
-FROM v_laporan_penggantian
-ORDER BY tanggal DESC
-LIMIT 10;
+-- ===========================================
+-- TRIGGER (contoh: update_pegawai_timestamp)
+-- ===========================================
 
--- TEST TRIGGER
-SELECT '=== CEK TRIGGER: update_pegawai_timestamp ===' AS header;
-UPDATE pegawai 
-SET nama = 'Faqih Anam Updated' 
-WHERE id = 1;
+DELIMITER $$
 
-SELECT 
-    id AS pegawai_id,
-    username,
-    nama,
-    DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS created_at,
-    DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i:%s') AS updated_at
-FROM pegawai
-WHERE id = 1;
+CREATE TRIGGER update_pegawai_timestamp
+BEFORE UPDATE ON pegawai
+FOR EACH ROW
+BEGIN
+    SET NEW.updated_at = NOW();
+END$$
 
--- SELESAI TESTING
-SELECT '=== SEMUA TEST SUKSES DIJALANKAN ===' AS status;
+CREATE TRIGGER update_dispenser_timestamp
+BEFORE UPDATE ON dispenser
+FOR EACH ROW
+BEGIN
+    SET NEW.updated_at = NOW();
+END$$
+
+DELIMITER ;
+
+-- ===========================================
+-- SELESAI
+-- ===========================================
+
+SELECT '=== SCMS DB SETUP COMPLETE ===' AS status;
