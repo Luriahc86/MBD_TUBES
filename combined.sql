@@ -7,6 +7,6 @@ SOURCE seed/05_login.sql;
 SOURCE seed/06_laporan.sql;
 SOURCE functions/total_tisu_by_pegawai.sql;
 SOURCE procedures/tambah_laporan_penggantian.sql;
-SOURCE views/v_laporan_penggantian.sql;
 SOURCE triggers/update_dispenser_timestamp.sql;
 SOURCE triggers/update_pegawai_timestamp.sql;
+SOURCE views/v_laporan_penggantian.sql;

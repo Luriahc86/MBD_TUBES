@@ -1,3 +1,5 @@
+USE cleaning_db;
+
 CREATE OR REPLACE VIEW v_laporan_penggantian AS
 SELECT 
     l.id_laporan,

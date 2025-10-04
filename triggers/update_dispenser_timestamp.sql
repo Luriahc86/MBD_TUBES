@@ -1,3 +1,6 @@
+USE cleaning_db;
+
+DROP TRIGGER IF EXISTS update_dispenser_timestamp;
 DELIMITER $$
 
 CREATE TRIGGER update_dispenser_timestamp

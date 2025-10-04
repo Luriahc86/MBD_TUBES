@@ -1,3 +1,6 @@
+USE cleaning_db;
+
+DROP FUNCTION IF EXISTS total_tisu_by_pegawai;
 DELIMITER $$
 
 CREATE FUNCTION total_tisu_by_pegawai(p_id_pegawai INT)

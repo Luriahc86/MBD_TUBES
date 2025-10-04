@@ -1,3 +1,6 @@
+USE cleaning_db;
+
+DROP PROCEDURE IF EXISTS tambah_laporan_penggantian;
 DELIMITER $$
 
 CREATE PROCEDURE tambah_laporan_penggantian(
