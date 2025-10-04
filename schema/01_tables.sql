@@ -23,18 +23,29 @@ CREATE TABLE pegawai (
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- Lokasi (tempat dispenser)
 CREATE TABLE lokasi (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  nama_lokasi VARCHAR(100)
+    id_lokasi SERIAL PRIMARY KEY,
+    nama_lokasi VARCHAR(100) NOT NULL,
+    deskripsi TEXT
 );
 
+-- Dispenser (alat tisu)
 CREATE TABLE dispenser (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  lokasi_id INT,
-  status VARCHAR(50),
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (lokasi_id) REFERENCES lokasi(id)
+    id_dispenser SERIAL PRIMARY KEY,
+    id_lokasi INT REFERENCES lokasi(id_lokasi),
+    kode_dispenser VARCHAR(20) UNIQUE NOT NULL,
+    status VARCHAR(20) DEFAULT 'AKTIF',
+    last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Laporan penggantian tisu
+CREATE TABLE laporan_penggantian (
+    id_laporan SERIAL PRIMARY KEY,
+    id_pegawai INT REFERENCES pegawai(id_pegawai),
+    id_dispenser INT REFERENCES dispenser(id_dispenser),
+    waktu TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    jumlah_tisu INT NOT NULL
 );
 
 CREATE TABLE login (

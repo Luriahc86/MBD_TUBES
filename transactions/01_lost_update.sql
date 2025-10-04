@@ -1,24 +1,11 @@
-USE cleaning_db;
+-- Session A
+BEGIN;
+UPDATE dispenser SET status = 'RUSAK' WHERE id_dispenser = 1;
 
--- Simulasi Lost Update (TANPA LOCK)
+-- Session B (belum commit)
+BEGIN;
+UPDATE dispenser SET status = 'AKTIF' WHERE id_dispenser = 1;
+COMMIT;
 
--- Transaksi A
-START TRANSACTION;
-SELECT * FROM pegawai WHERE id = 1;
--- hasil: misalnya "Faqih Chairul Anam"
-
--- Update oleh Transaksi A
-UPDATE pegawai SET nama = 'Faqih Update A' WHERE id = 1;
--- (belum commit)
-
--- Transaksi B
-START TRANSACTION;
-SELECT * FROM pegawai WHERE id = 1;
--- hasil masih "Faqih Chairul Anam"
-
--- Update oleh Transaksi B (menimpa A)
-UPDATE pegawai SET nama = 'Faqih Update B' WHERE id = 1;
-COMMIT; -- Transaksi B commit
-
--- Sekarang Transaksi A commit
-COMMIT; -- Hasil update A hilang!
+-- Session A commit → Lost update (perubahan A hilang)
+COMMIT;
