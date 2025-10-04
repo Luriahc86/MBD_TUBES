@@ -1,4 +1,4 @@
 START TRANSACTION;
-INSERT INTO lokasi (nama_lokasi, deskripsi) VALUES ('Gedung D - Lantai 2', 'Dekat pantry');
-INSERT INTO dispenser (id_lokasi, kode_dispenser) VALUES (999, 'DSP-099'); -- Error (foreign key tidak ada)
-ROLLBACK; -- Semua perubahan dibatalkan
+INSERT INTO lokasi (nama_lokasi, deskripsi) VALUES ('Gedung X - Lantai 1', 'Dummy lokasi');
+INSERT INTO dispenser (id_lokasi, kode_dispenser) VALUES (999, 'DSP-999'); -- error
+ROLLBACK; -- semua perubahan dibatalkan

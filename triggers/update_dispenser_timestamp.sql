@@ -1,9 +1,10 @@
-DROP TRIGGER IF EXISTS update_dispenser_timestamp;
-DELIMITER //
+DELIMITER $$
+
 CREATE TRIGGER update_dispenser_timestamp
 BEFORE UPDATE ON dispenser
 FOR EACH ROW
 BEGIN
-  SET NEW.updated_at = CURRENT_TIMESTAMP;
-END //
+    SET NEW.last_update = NOW();
+END$$
+
 DELIMITER ;

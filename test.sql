@@ -1,78 +1,14 @@
-USE cleaning_db;
+-- Test procedure
+CALL tambah_laporan_penggantian(1, 3, 77);
 
--- ====================================
--- SEED DATA (UNTUK PENGUJIAN)
--- ====================================
+-- Test function
+SELECT total_tisu_by_pegawai(1) AS total_tisu_Andi;
 
--- Tambah admin
-INSERT INTO admin (username, password, nama)
-VALUES ('admin1', '12345', 'Super Admin');
+-- Test view
+SELECT * FROM v_laporan_penggantian;
 
--- Tambah pegawai
-INSERT INTO pegawai (username, password, nama)
-VALUES 
-  ('pegawai1', 'abc123', 'Faqih Chairul Anam'),
-  ('pegawai2', 'xyz456', 'Alya Juniar');
+-- Test trigger (update dispenser)
+UPDATE dispenser SET status='RUSAK' WHERE id_dispenser=5;
 
--- Tambah lokasi
-INSERT INTO lokasi (nama_lokasi) 
-VALUES ('Lobi Utama'), 
-       ('Ruang Tunggu A');
-
--- Tambah dispenser
-INSERT INTO dispenser (lokasi_id, status) 
-VALUES (1, 'Aktif'), 
-       (2, 'Aktif');
-
--- Tambah laporan penggantian via procedure (procedure sudah ada di main.sql)
-CALL tambah_laporan_penggantian(1, 1, 5, CURDATE());
-CALL tambah_laporan_penggantian(2, 2, 3, CURDATE());
-
--- ====================================
--- TEST FUNCTION
--- ====================================
-SELECT '=== HASIL FUNCTION: total_tisu_by_pegawai ===' AS header;
-
-SELECT 
-    1 AS pegawai_id,
-    total_tisu_by_pegawai(1) AS total_tisu;
-
--- ====================================
--- TEST VIEW
--- ====================================
-SELECT '=== HASIL VIEW: v_laporan_penggantian ===' AS header;
-
-SELECT 
-    id AS laporan_id,
-    nama_pegawai,
-    dispenser_id,
-    nama_lokasi,
-    jumlah,
-    DATE_FORMAT(tanggal, '%Y-%m-%d') AS tanggal
-FROM v_laporan_penggantian
-ORDER BY tanggal DESC
-LIMIT 10;
-
--- ====================================
--- TEST TRIGGER
--- ====================================
-SELECT '=== CEK TRIGGER: update_pegawai_timestamp ===' AS header;
-
--- Update nama pegawai → seharusnya updated_at ikut berubah
-UPDATE pegawai 
-SET nama = 'Faqih Anam Updated' 
-WHERE id = 1;
-
-SELECT 
-    id AS pegawai_id,
-    username,
-    nama,
-    DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS created_at,
-    DATE_FORMAT(updated_at, '%Y-%m-%d %H:%i:%s') AS updated_at
-FROM pegawai
-WHERE id = 1;
-
--- ====================================
--- SELESAI TESTING
--- ====================================
-SELECT '=== SEMUA TEST SUKSES DIJALANKAN ===' AS status;
+-- Check hasil update
+SELECT * FROM dispenser WHERE id_dispenser=5;

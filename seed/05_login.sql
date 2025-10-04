@@ -1,5 +1,3 @@
-INSERT INTO login (user_id, role)
-VALUES 
-  (1, 'admin'),
-  (1, 'pegawai'),
-  (2, 'pegawai');
+INSERT INTO login (id_admin) VALUES
+(1),
+(2);
