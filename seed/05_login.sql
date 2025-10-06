@@ -1,3 +1,4 @@
+-- Active: 1747977627544@@127.0.0.1@3306@cleaning_db
 INSERT INTO login (id_admin) VALUES (1), (2);
 -- Data login admin
 INSERT INTO login (id_admin, waktu_login) VALUES

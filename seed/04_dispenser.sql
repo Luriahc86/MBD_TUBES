@@ -1,3 +1,4 @@
+-- Active: 1747977627544@@127.0.0.1@3306@cleaning_db
 INSERT INTO dispenser (id_lokasi, kode_dispenser, status) VALUES
 (1, 'DSP-001', 'AKTIF'),
 (1, 'DSP-002', 'AKTIF'),

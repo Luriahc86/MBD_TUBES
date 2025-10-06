@@ -1,3 +1,4 @@
+-- Active: 1747977627544@@127.0.0.1@3306@cleaning_db
 USE cleaning_db;
 
 DROP FUNCTION IF EXISTS total_tisu_by_pegawai;
