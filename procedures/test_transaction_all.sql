@@ -5,13 +5,14 @@ DELIMITER $$
 
 CREATE PROCEDURE test_transaction_all()
 BEGIN
+    -- Handler untuk error (rollback otomatis)
     DECLARE EXIT HANDLER FOR SQLEXCEPTION 
     BEGIN
         ROLLBACK;
         SELECT 'Error terjadi, transaksi dibatalkan (Failure & Recovery)' AS info;
     END;
 
-    -- TRANSACTION
+    -- ==================== TRANSACTION ====================
     START TRANSACTION;
         INSERT INTO laporan_penggantian (id_pegawai, id_dispenser, jumlah_tisu)
         VALUES (2, 4, 88);
@@ -21,7 +22,7 @@ BEGIN
     COMMIT;
     SELECT 'Transaction sukses (Commit)' AS info;
 
-    -- FAILURE AND RECOVERY
+    -- ==================== FAILURE AND RECOVERY ====================
     START TRANSACTION;
         INSERT INTO laporan_penggantian (id_pegawai, id_dispenser, jumlah_tisu)
         VALUES (3, 5, 77);
@@ -31,7 +32,7 @@ BEGIN
     COMMIT;
     SELECT 'Baris ini tidak akan dieksekusi jika terjadi error' AS info;
 
-    -- CONCURRENCY CONTROL (LOCKING)
+    -- ==================== CONCURRENCY CONTROL (LOCKING) ====================
     START TRANSACTION;
         SELECT * FROM dispenser WHERE id_dispenser = 2 FOR UPDATE;
         UPDATE dispenser 
@@ -39,5 +40,8 @@ BEGIN
         WHERE id_dispenser = 2;
     COMMIT;
     SELECT 'Locking berhasil dijalankan' AS info;
-    
+
+END$$
+
 DELIMITER ;
+CALL test_transaction_all();
